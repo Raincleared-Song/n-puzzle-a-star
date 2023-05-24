@@ -14,7 +14,12 @@ def main():
     fout = open(f'puzzle_{args.n}.txt', 'w')
     sys.stdout = fout
 
+    # random initialization
     puz = PuzzleNode(args.n, log=True)
+    # initialization with specific status, 0 represents the blank position
+    # specific_status = [4, 1, 8, 0, 2, 7, 5, 3, 6]
+    # puz = PuzzleNode(3, status=specific_status, log=True)
+
     solvable, num_inversions = puz.check_solvable()
     suffix = "SOLVABLE" if solvable else "UNSOLVABLE"
     print(f"Number of inversions is {num_inversions}, therefore it is {suffix} !!!\n")
