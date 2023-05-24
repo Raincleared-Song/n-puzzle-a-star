@@ -86,8 +86,7 @@ class PuzzleNode:
             for j in range(i + 1, self.total_n):
                 x, y = self.status[i], self.status[j]
                 num_inversions += int(x > y > 0)
-        suffix = "SOLVABLE" if num_inversions % 2 == 0 else "UNSOLVABLE"
-        print(f"Number of inversions is {num_inversions}, therefore it is {suffix} !!!")
+        return num_inversions % 2 == 0, num_inversions
 
     def solve(self):
         close_list: Set[str] = set()

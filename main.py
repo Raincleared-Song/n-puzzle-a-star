@@ -15,9 +15,13 @@ def main():
     sys.stdout = fout
 
     puz = PuzzleNode(args.n, log=True)
-    puz.check_solvable()
-    print()
-    puz.solve()
+    solvable, num_inversions = puz.check_solvable()
+    suffix = "SOLVABLE" if solvable else "UNSOLVABLE"
+    print(f"Number of inversions is {num_inversions}, therefore it is {suffix} !!!\n")
+    if solvable:
+        puz.solve()
+    else:
+        print('No Solution!')
 
     fout.close()
 
