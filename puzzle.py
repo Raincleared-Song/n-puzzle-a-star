@@ -79,14 +79,20 @@ class PuzzleNode:
     def check_solvable(self):
         """
             check if a puzzle is solvable by the number of inversions
-            A puzzle is solvable if and only if the number of inversions is even.
+            if n is odd: puzzle is solvable if and only if
+                the number of inversions is even.
+            if n is even: puzzle is solvable if and only if
+                the row index (start from 0) + the number of inversions is odd.
         """
         num_inversions = 0
         for i in range(self.total_n):
             for j in range(i + 1, self.total_n):
                 x, y = self.status[i], self.status[j]
                 num_inversions += int(x > y > 0)
-        return num_inversions % 2 == 0, num_inversions
+        if self.n % 2 == 0:
+            return (self.zero_pos // self.n + num_inversions) % 2 == 1, num_inversions
+        else:
+            return num_inversions % 2 == 0, num_inversions
 
     def solve(self):
         close_list: Set[str] = set()

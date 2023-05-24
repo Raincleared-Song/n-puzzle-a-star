@@ -22,7 +22,8 @@ def main():
 
     solvable, num_inversions = puz.check_solvable()
     suffix = "SOLVABLE" if solvable else "UNSOLVABLE"
-    print(f"Number of inversions is {num_inversions}, therefore it is {suffix} !!!\n")
+    print(f"Number of inversions is {num_inversions}, N is {args.n} and the blank is in row {puz.zero_pos // puz.n},"
+          f" therefore it is {suffix} !!!\n")
     if solvable:
         puz.solve()
     else:
