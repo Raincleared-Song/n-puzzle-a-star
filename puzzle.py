@@ -123,8 +123,10 @@ class PuzzleNode:
             estimate_cost = root.estimate_cost + new_val - old_val
             if new_fingerprint in open_list_map:
                 new_node = open_list_map[new_fingerprint]
-                new_node.parent, new_node.current_cost, new_node.estimate_cost = root, current_cost, estimate_cost
-                heapq.heapify(open_list)  # how to improve the efficiency here?
+                assert new_node.estimate_cost == estimate_cost
+                if current_cost < new_node.current_cost:
+                    new_node.parent, new_node.current_cost = root, current_cost
+                    heapq.heapify(open_list)  # how to improve the efficiency here?
             else:
                 new_node = PuzzleNode(n, status=new_status, parent=root,
                                       current_cost=current_cost, estimate_cost=estimate_cost, zero_pos=new_pos)
