@@ -1,7 +1,7 @@
 import heapq
 import random
 from enum import Enum
-from typing import List, Optional, Set
+from typing import List, Optional, Set, Dict
 
 
 class StepDirection(Enum):
@@ -31,12 +31,15 @@ class PuzzleNode:
         self.current_cost = 0 if current_cost == -1 else current_cost
         # h(n), can be calculated efficiently from the parent node
         self.estimate_cost = self.cal_total_estimate_cost() if estimate_cost == -1 else estimate_cost
-        self.total_cost = self.current_cost + self.estimate_cost  # f(n)
         if log:
             self.print_status()
             print(f"Current Cost: {self.current_cost}; Estimate Cost: {self.estimate_cost};"
                   f" Total Cost: {self.total_cost}")
         self.zero_pos = self.status.index(0) if zero_pos == -1 else zero_pos
+
+    @property
+    def total_cost(self) -> int:  # f(n)
+        return self.current_cost + self.estimate_cost
 
     def print_status(self):
         print('Current Status:')
@@ -97,6 +100,7 @@ class PuzzleNode:
     def solve(self):
         close_list: Set[str] = set()
         open_list: List[PuzzleNode] = [self]
+        open_list_map: Dict[str, PuzzleNode] = {PuzzleNode.get_fingerprint(self.status): self}
         n, num_nodes_check, num_nodes_expand = self.n, 0, 1
 
         def step(nx, ny):
@@ -108,7 +112,8 @@ class PuzzleNode:
             new_status[zero_pos] = new_status[new_pos]
             new_status[new_pos] = tmp
             assert tmp == 0
-            if PuzzleNode.get_fingerprint(new_status) in close_list:
+            new_fingerprint = PuzzleNode.get_fingerprint(new_status)
+            if new_fingerprint in close_list:
                 return
             current_cost = root.current_cost + 1
             t_pos = root.status[new_pos] - 1
@@ -116,14 +121,22 @@ class PuzzleNode:
             new_val = abs(zx - tx) + abs(zy - ty)
             old_val = abs(nx - tx) + abs(ny - ty)
             estimate_cost = root.estimate_cost + new_val - old_val
-            new_node = PuzzleNode(n, status=new_status, parent=root,
-                                  current_cost=current_cost, estimate_cost=estimate_cost, zero_pos=new_pos)
-            heapq.heappush(open_list, new_node)
+            if new_fingerprint in open_list_map:
+                new_node = open_list_map[new_fingerprint]
+                new_node.parent, new_node.current_cost, new_node.estimate_cost = root, current_cost, estimate_cost
+                heapq.heapify(open_list)  # how to improve the efficiency here?
+            else:
+                new_node = PuzzleNode(n, status=new_status, parent=root,
+                                      current_cost=current_cost, estimate_cost=estimate_cost, zero_pos=new_pos)
+                heapq.heappush(open_list, new_node)
+                open_list_map[new_fingerprint] = new_node
             num_nodes_expand += 1
 
         answer = None
         while len(open_list) > 0:
             root = heapq.heappop(open_list)
+            root_fingerprint = PuzzleNode.get_fingerprint(root.status)
+            del open_list_map[root_fingerprint]
             if root.estimate_cost == 0:
                 # find the answer
                 answer = root
@@ -139,7 +152,7 @@ class PuzzleNode:
                 step(zx, zy - 1)
             if zy < n - 1:
                 step(zx, zy + 1)
-            close_list.add(PuzzleNode.get_fingerprint(root.status))
+            close_list.add(root_fingerprint)
             num_nodes_check += 1
 
         print("Total nodes checked:", num_nodes_check)
