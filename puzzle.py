@@ -1,7 +1,8 @@
 import heapq
 import random
+import numpy as np
 from enum import Enum
-from typing import List, Optional, Set, Dict
+from typing import List, Optional, Set, Dict, Tuple
 
 
 class StepDirection(Enum):
@@ -97,11 +98,15 @@ class PuzzleNode:
         else:
             return num_inversions % 2 == 0, num_inversions
 
-    def solve(self):
+    def solve(self, log=True) -> Optional[Tuple[int, int, List[np.ndarray]]]:
         close_list: Set[str] = set()
         open_list: List[PuzzleNode] = [self]
         open_list_map: Dict[str, PuzzleNode] = {PuzzleNode.get_fingerprint(self.status): self}
         n, num_nodes_check, num_nodes_expand = self.n, 0, 1
+
+        def print_log(*args, **kwargs):
+            if log:
+                print(args, kwargs)
 
         def step(nx, ny):
             nonlocal num_nodes_expand
@@ -157,10 +162,11 @@ class PuzzleNode:
             close_list.add(root_fingerprint)
             num_nodes_check += 1
 
-        print("Total nodes checked:", num_nodes_check)
-        print("Total nodes expanded:", num_nodes_expand)
+        print_log("Total nodes checked:", num_nodes_check)
+        print_log("Total nodes expanded:", num_nodes_expand)
         if answer is None:
-            print('No Solution!')
+            print_log('No Solution!')
+            return None
         else:
             solution_path = []
             cur_node = answer
@@ -168,8 +174,12 @@ class PuzzleNode:
                 solution_path.append(cur_node)
                 cur_node = cur_node.parent
             solution_path.reverse()
-            print("Total solution steps:", len(solution_path) - 1)
-            print('The solution path is:')
+            print_log("Total solution steps:", len(solution_path) - 1)
+            print_log('The solution path is:')
+            res_path = []
             for node in solution_path:
-                node.print_status()
-                print('\n' + '=' * 30 + '\n')
+                if log:
+                    node.print_status()
+                res_path.append(np.array(node.status).reshape((self.n, self.n)))
+                print_log('\n' + '=' * 30 + '\n')
+            return num_nodes_check, num_nodes_expand, res_path
