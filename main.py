@@ -27,15 +27,15 @@ def frontend_solve(inputs: np.ndarray) -> Optional[Tuple[int, int, List[np.ndarr
 def batch_test():
     """
     test result:
-    [0.2, 0.4, 0.6, 0.8, 1.03, 1.5, 1.75, 2.24, 2.96, 3.27,
-     4.72, 7.75, 6.72, 11.65, 17.36, 16.29, 24.79, 27.0, 50.33, 40.01]
-    average search step: 11.0685
+    [1.0, 2.0, 3.0, 4.0, 5.21, 6.8, 8.39, 10.71, 14.09, 16.61,
+     22.59, 32.11, 36.33, 52.71, 71.42, 89.4, 122.52, 132.34, 203.85, 224.84]
+    average search step: 52.996
     """
     test_case_dir = 'boards'
     num_stages, cases_per_stage = 20, 100
     counter = [0 for _ in range(num_stages)]
     for stage in range(num_stages):
-        for case in range(num_stages):
+        for case in range(cases_per_stage):
             case_dir = f'{test_case_dir}/{stage}_{case}.npy'
             inputs = np.load(case_dir)
             res = frontend_solve(inputs)
